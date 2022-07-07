@@ -3,7 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .models import Book
+from .models import Book,Employee
 from .serializers import BookSerializer
 
 
@@ -41,6 +41,55 @@ def book_detail(request, id):
         book = Book.objects.get(pk=id)
         book.delete()
         return Response("object  deleted successfully")
+
+#Django View function to send HttpResponse with json data
+import json
+from django.http import HttpResponse,JsonResponse
+def emp_data_json_view(request):
+    emp_data={'eno':1, 'ename':'pradeep', 'esal':3000 }
+    json_data = json.dumps(emp_data)
+    return HttpResponse(json_data)
+
+def emp_data_json_response(request):
+    emp_data = {'eno': 1, 'ename': 'pradeep', 'esal': 30000}
+    return JsonResponse(emp_data)
+
+from django.views.generic import View
+class JsonCbv(View):
+    def get(self, *args, **kwargs):
+        emp_data = {'eno': 1, 'ename': 'pradeep kumar', 'esal': 30000}
+        return JsonResponse(emp_data)
+
+#Mixin example
+
+from .mixins import JsonResponseMixin
+class JsonCBV2(JsonResponseMixin, View):
+    def get(self, request, *args, **kwargs):
+        emp_data = {'eno': 1, 'ename': 'yaramala pradeep kumar', 'esal': 30000}
+        return self.render_to_json_response(emp_data)
+
+#performing database crud operations by using webapi without REST framework
+from django.core.serializers import serialize
+
+class EmployeeCRUDcbv(View):
+
+    def get(self,request,id, *args, **kwargs):
+        employee = Employee.objects.get(id=id)
+        json_data = serialize('json', [employee], fields=('eno','ename'))
+        return HttpResponse(json_data, content_type='application/json')
+
+#To get all employees
+
+class EmployeeListCBV(View):
+    def get(self,request, *args, **kwargs):
+        employees = Employee.objects.all()
+        emp_data = serialize('json', employees)
+        pdict = json.loads(emp_data)
+        final_list =[]
+        for obj in pdict:
+            final_list.append(obj['fields'])
+        return HttpResponse(final_list)
+
 
 
 

@@ -9,3 +9,8 @@ class Book(models.Model):
 
     def __str__(self):
         return self.name
+class Employee(models.Model):
+    eno = models.IntegerField()
+    ename = models.CharField(max_length=30)
+    esal = models.CharField(max_length=64)
+    eaddr = models.CharField(max_length=64)
