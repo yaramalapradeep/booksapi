@@ -9,6 +9,6 @@ urlpatterns = [
     path('emp-JsonCbv-response/', JsonCbv.as_view(), name='emp_data_json_view'),
     path('emp-JsonCbv2-response/', JsonCBV2.as_view(), name='emp_data_json_view'),
     path('EmployeeCRUDcbv/<int:id>', EmployeeCRUDcbv.as_view(), name='EmployeeCRUDcbv' ),
-    path('EmployeeListCBV/', EmployeeListCBV.as_view(), name='EmployeeListCBV'),
+    path('EmployeeListCBV2/', EmployeeListCBV.as_view(), name='EmployeeListCBV2'),
 
    ]

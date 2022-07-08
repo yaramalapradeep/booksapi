@@ -62,7 +62,7 @@ class JsonCbv(View):
 
 #Mixin example
 
-from .mixins import JsonResponseMixin
+from .mixins import JsonResponseMixin,HttpResponseMixin
 class JsonCBV2(JsonResponseMixin, View):
     def get(self, request, *args, **kwargs):
         emp_data = {'eno': 1, 'ename': 'yaramala pradeep kumar', 'esal': 30000}
@@ -80,19 +80,37 @@ class EmployeeCRUDcbv(View):
 
 #To get all employees
 
-class EmployeeListCBV(View):
+# class EmployeeListCBV(View):
+#     def get(self,request, *args, **kwargs):
+#         employees = Employee.objects.all()
+#         emp_data = serialize('json', employees)
+#         pdict = json.loads(emp_data)
+#         final_list =[]
+#         for obj in pdict:
+#             final_list.append(obj['fields'])
+#         return HttpResponse(final_list)
+
+from .mixins import SerializeMixin
+class EmployeeListCBV2(SerializeMixin, View):
     def get(self,request, *args, **kwargs):
-        employees = Employee.objects.all()
-        emp_data = serialize('json', employees)
-        pdict = json.loads(emp_data)
-        final_list =[]
-        for obj in pdict:
-            final_list.append(obj['fields'])
-        return HttpResponse(final_list)
+        qs = Employee.objects.all()
+        json_data = self.serialize(qs)
+        return HttpResponse(json_data, content_type='application/json')
 
 
+from .utils import is_json
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 
+@method_decorator(csrf_exempt, name='dispatch')
+class EmployeeListCBV(HttpResponseMixin,SerializeMixin,View):
+    def post(self, request, *args, **kwargs):
+        data = request.body
+        if not is_json(data):
+            return self.render_to_http_response(json.dumps({'msg':'please send valid json data only'}), status=400)
+        json_data = json.dumps({'msg':'post method'})
+        return self.render_to_http_response(json_data)
 
 
 
